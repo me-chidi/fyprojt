@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e21fd88d1b0ef1bbb1f2e0ad63ad9e7e2bf72297dad082c7da88734052751ac0"
+            "sha256": "f589ddf5fcf1917d9ef327c5e3d4def6e0041ba229197e2a0c7e5e705b8a484b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -44,7 +44,6 @@
                 "sha256:e84e0e6f8e40a242b11bce56c313edc2be121cec3e0ec2d76fce01f6af33c07c",
                 "sha256:f85b1ffa09240c89aa2e1ae9f3b1c687104f7b2b9d2098da4e923f1b7082d331"
             ],
-            "index": "pypi",
             "markers": "python_version >= '3.7'",
             "version": "==4.2.1"
         },
@@ -81,6 +80,14 @@
             "markers": "python_version >= '3.9'",
             "version": "==3.1.0"
         },
+        "flask-bcrypt": {
+            "hashes": [
+                "sha256:062fd991dc9118d05ac0583675507b9fe4670e44416c97e0e6819d03d01f808a",
+                "sha256:f07b66b811417ea64eb188ae6455b0b708a793d966e1a80ceec4a23bc42a4369"
+            ],
+            "index": "pypi",
+            "version": "==1.0.1"
+        },
         "flask-login": {
             "hashes": [
                 "sha256:5e23d14a607ef12806c699590b89d0f0e0d67baeec599d75947bf9c147330333",
@@ -98,6 +105,15 @@
             "index": "pypi",
             "markers": "python_version >= '3.8'",
             "version": "==3.1.1"
+        },
+        "flask-wtf": {
+            "hashes": [
+                "sha256:79d2ee1e436cf570bccb7d916533fa18757a2f18c290accffab1b9a0b684666b",
+                "sha256:e93160c5c5b6b571cf99300b6e01b72f9a101027cab1579901f8b10c5daf0b70"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.9'",
+            "version": "==1.2.2"
         },
         "greenlet": {
             "hashes": [
@@ -175,7 +191,7 @@
                 "sha256:f406b22b7c9a9b4f8aa9d2ab13d6ae0ac3e85c9a809bd590ad53fed2bf70dc79",
                 "sha256:f6ff3b14f2df4c41660a7dec01045a045653998784bf8cfcb5a525bdffffbc8f"
             ],
-            "markers": "python_version < '3.14' and (platform_machine == 'aarch64' or (platform_machine == 'ppc64le' or (platform_machine == 'x86_64' or (platform_machine == 'amd64' or (platform_machine == 'AMD64' or (platform_machine == 'win32' or platform_machine == 'WIN32'))))))",
+            "markers": "python_version < '3.14' and platform_machine == 'aarch64' or (platform_machine == 'ppc64le' or (platform_machine == 'x86_64' or (platform_machine == 'amd64' or (platform_machine == 'AMD64' or (platform_machine == 'win32' or platform_machine == 'WIN32')))))",
             "version": "==3.1.1"
         },
         "itsdangerous": {

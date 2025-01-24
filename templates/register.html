@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}zRegister{% endblock %}
+{% block content %}
+    <br><br>
+    <div class="container">
+        <form action="" method="post">
+            <ol>
+                {{ form.hidden_tag() }}
+            </ol>
+            <ol>
+                {{ form.username }}
+            </ol>
+            <ol>
+                {{ form.password }}
+            </ol>
+            <ol>
+                {{ form.submit }}
+            </ol>
+        </form>
+        <br><br>
+        <a href="{{ url_for("register") }}">Already have an account? Login</a>
+    </div>
+    
+{% endblock %}
