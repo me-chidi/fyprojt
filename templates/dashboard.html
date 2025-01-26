@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-    <div>
-        <span>
-            {# turn on #}
-            <form action="/update_all", method="post">
-                <input type="submit" value="ALL" class="btn btn-secondary">
-            </form>
-            
-            <div>
-                <span>
-                    <p>Node</p>
-                    <input type="text" class="dropdown">
-                    <a href="/update/" class="btn btn-outline-secondary btn-sm" name="node_id">Go</a>                 
-                    {# set the input to redirect to update with the id #}
-                </span>
+    <div class="btn2">
+        <div class="btn">
+          <p>TURN ON</p>
+          <button type="submit" name="ON">ALL</button> 
+      
+          <div class="dropdown">
+            <button class="dropdown-btn">Select Node</button>
+            <div class="dropdown-content">
+              <div class="search-wrapper">
+                <input type="text" id="dropdownSearch" placeholder="Search...">
+                <button class="go-btn" id="goBtn1">GO</button>
+              </div>
+              {% for node in nodes %}
+                <a href="/update/{{node.id}}">{{ node.id }}</a>
+              {% endfor %}
             </div>
-        </span>
-    </div>
-
+          </div>
+        </div>
 
     <br>
     <span>{# turn off #}</span>

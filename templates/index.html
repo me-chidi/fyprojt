@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block title %}zLogin{% endblock %}
 {% block content %}
-<h1>LOGIN PAGE</h1>
     <br><br>
     <div class="container">
         {# if login fails throw warning #}
+        <h3>Welcome to Zigbee Street Light Control Panel!</h3>
         {% if fail %}
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 <strong>Username or password does not match!</strong>
@@ -12,18 +12,10 @@
             </div>
         {% endif %}  
         <form action="" method="post">
-            <ol>
-                {{ form.hidden_tag() }}
-            </ol>
-            <ol>
-                {{ form.username }}
-            </ol>
-            <ol>
-                {{ form.password }}
-            </ol>
-            <ol>
-                {{ form.submit }}
-            </ol>
+            <ol>{{ form.hidden_tag() }}</ol>
+            <ol>{{ form.username }}</ol>
+            <ol>{{ form.password }}</ol>
+            <ol>{{ form.submit }}</ol>
         </form>
         <br><br>
         <a href="{{ url_for("register") }}">Don't have an account? Register</a>

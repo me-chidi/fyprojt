@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 app.app_context().push()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['SECRET_KEY'] = os.environ.get('FSKY')
+app.config['SECRET_KEY'] = 'notasecret'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 #migrate = Migrate(app, db)
@@ -64,8 +64,8 @@ class LoginForm(FlaskForm):
 
 @app.route('/', methods=['GET','POST'])
 def index():
-    form = LoginForm()
     fail = False
+    form = LoginForm()
     if form.validate_on_submit():
         #logs in if user and password exist
         user = User.query.filter_by(username=form.username.data).first()
@@ -81,23 +81,28 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegisterForm()
+    duplicate = False
     fail = False
-    #create logic to prevent duplicate users 
+    form = RegisterForm()
+
     if form.validate_on_submit():
-        hashed_pwd = bcrypt.generate_password_hash(form.password.data)
-        user = User(username=form.username.data, password=hashed_pwd)
-        try:
-            db.session.add(user)
-            db.session.commit()
-            return redirect(url_for('index'))
-        except:
-            fail = True
-    return render_template('register.html', form=form, fail=fail)
+        #logic to prevent duplicate users 
+        if User.query.filter_by(username=form.username.data).first():
+            duplicate = True
+        else:
+            hashed_pwd = bcrypt.generate_password_hash(form.password.data)
+            user = User(username=form.username.data, password=hashed_pwd)
+            try:
+                db.session.add(user)
+                db.session.commit()
+                return redirect(url_for('index'))
+            except:
+                fail = True
+    return render_template('register.html', form=form, fail=fail, duplicate=duplicate)
 
 @app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
 def dashboard():
- 
     if request.method == 'POST':
     #monitring stuff here
         return redirect(url_for('dashboard'))
@@ -107,8 +112,8 @@ def dashboard():
             node_id = int(node_data[0])
             status = node_data[1]
             mode = node_data[2]
+
             node = Nodes.query.get(node_id)
-        
             #if node exists already then update
             if node:
                 node.status = status
@@ -127,9 +132,10 @@ def dashboard():
         nodes = Nodes.query.all()
         return render_template('dashboard.html', nodes=nodes)
 
-@app.route('/update/<int:id>', methods=['POST'])
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+@login_required
 def update(id):
-    #called from turn off/on form
+    #called from the dropdown
     #single update
     node = Nodes.query.get_or_404(id)
     node.status = request.form['node_id']
@@ -140,20 +146,21 @@ def update(id):
     return redirect(url_for('dashboard'))
     
 @app.route('/update_all', methods=['GET', 'POST'])
+@login_required
 def update_all():
+    #called from 'ALL' button in form
     #multiple update
-    if request.method == 'POST':
-        nodes = Nodes.query.all()
-        for node in nodes:
-            node.status = request.form['value']
-        try:
-            db.session.commit() 
-        except:
-            return 'There was an error updating nodes' 
+    nodes = Nodes.query.all()
+    for node in nodes:
+        node.status = request.form['value']
+    try:
+        db.session.commit() 
+    except:
+        return 'There was an error updating nodes' 
     return redirect(url_for('dashboard'))
 
-
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
