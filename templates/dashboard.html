@@ -1,1 +1,52 @@
 {% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div>
+        <span>
+            {# turn on #}
+            <form action="/update_all", method="post">
+                <input type="submit" value="ALL" class="btn btn-secondary">
+            </form>
+            
+            <div>
+                <span>
+                    <p>Node</p>
+                    <input type="text" class="dropdown">
+                    <a href="/update/" class="btn btn-outline-secondary btn-sm" name="node_id">Go</a>                 
+                    {# set the input to redirect to update with the id #}
+                </span>
+            </div>
+        </span>
+    </div>
+
+
+    <br>
+    <span>{# turn off #}</span>
+    </div>
+    <br><br><br>
+    <div class="container">
+    {# table here #}
+        <table class="table">
+            <thead>
+                <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Status</th>
+                <th scope="col">Mode</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for node in nodes %}
+                    <tr>
+                        <th>{{node.id}}</th>
+                        <th>{{node.status}}</th>
+                        <th>{{node.mode}}</th>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                {# last updated details#}
+            </tfoot>
+        </table>
+    </div>
+</div>
+{% endblock %}

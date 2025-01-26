@@ -1,8 +1,16 @@
 {% extends "base.html" %}
 {% block title %}zLogin{% endblock %}
 {% block content %}
+<h1>LOGIN PAGE</h1>
     <br><br>
     <div class="container">
+        {# if login fails throw warning #}
+        {% if fail %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Username or password does not match!</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}  
         <form action="" method="post">
             <ol>
                 {{ form.hidden_tag() }}

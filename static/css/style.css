@@ -1,0 +1,133 @@
+.btn2 {
+    display: block;
+  }
+  
+  .btn{
+    margin-right: 20px;
+  }
+
+#offbtn{
+    margin-top: 40px;
+}
+
+  button{
+    cursor: pointer;
+    padding: 10px 20px;
+  }
+
+  .dropdown-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  .dropdown-btn:hover {
+    background-color: #45a049;
+  }
+
+  /* Dropdown container */
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  /* Dropdown content - hidden by default */
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    max-height: 150px;
+    overflow-y: auto;
+    border-radius: 5px;
+  }
+
+  /* Links inside dropdown */
+  .dropdown-content a {
+    padding: 12px;
+    color: black;
+    text-decoration: none;
+    display: block;
+  }
+
+  .dropdown-content a:hover {
+    background-color: #f1f1f1;
+  }
+
+  /* Input box inside dropdown */
+  .dropdown-content input {
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 5px;
+  }
+
+  .search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .search-wrapper input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .search-wrapper .go-btn {
+    padding: 5px 15px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .search-wrapper .go-btn:hover {
+    background-color: #0056b3;
+  }
+  
+
+  /* table styling */
+.tablediv{
+    display: block;
+    margin-top: 40px;
+    width: 100%;
+   
+}
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 8px;
+  }
+
+  th {
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  tr:hover {
+    background-color: #ddd;
+  }

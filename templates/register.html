@@ -1,8 +1,15 @@
 {% extends "base.html" %}
 {% block title %}zRegister{% endblock %}
 {% block content %}
+<h1>REGISTER PAGE</h1>
     <br><br>
     <div class="container">
+        {% if fail %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>There was an error adding that user!</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
         <form action="" method="post">
             <ol>
                 {{ form.hidden_tag() }}
@@ -18,7 +25,7 @@
             </ol>
         </form>
         <br><br>
-        <a href="{{ url_for("register") }}">Already have an account? Login</a>
+        <a href="{{ url_for("index") }}">Already have an account? Login</a>
     </div>
     
 {% endblock %}
