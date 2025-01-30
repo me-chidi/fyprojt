@@ -1,23 +1,27 @@
 import json
 import os
-from config import njson
-from flask import Flask, request, redirect, url_for, render_template, jsonify
+import threading
+import pyduino as pyd
+from flask import Flask, request, redirect, url_for, render_template, jsonify, session
 from flask_login import login_required, current_user, LoginManager, UserMixin, login_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
-#from flask_migrate import Migrate
+from flask_migrate import Migrate
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
+from datetime import timedelta, datetime
 
 app = Flask(__name__)
 
 app.app_context().push()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['SECRET_KEY'] = 'notasecret'
+app.config['SECRET_KEY'] = os.environ.get('FSKY') or 'not-a-secret'
+app.config['START_NGROK'] = os.environ.get('START_NGROK') is not None and \
+    os.environ.get('WERKZEUG_RUN_MAIN') 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-#migrate = Migrate(app, db)
+migrate = Migrate(app, db)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -41,8 +45,9 @@ class OperationalTime(db.Model):
 class Nodes(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.String(5), nullable=False)
-    mode = db.Column(db.String(5), nullable=False)
-
+    battery_lvl = db.Column(db.Integer, nullable=False)
+    ldr_res = db.Column(db.Integer, nullable=False)
+    
 
 #forms
 class RegisterForm(FlaskForm):
@@ -59,8 +64,15 @@ class LoginForm(FlaskForm):
                              render_kw={'placeholder':'Password'})
     submit = SubmitField('Login')
 
+#logs the user out after 10 minutes
+@app.before_request 
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=10)
 
 
+serial_thread = threading.Thread(target=pyd.read_json_data, args=(pyd.connect_arduino(), db, Nodes, app.app_context()), daemon=True, )
+serial_thread.start()
 
 @app.route('/', methods=['GET','POST'])
 def index():
@@ -107,60 +119,60 @@ def dashboard():
     #monitring stuff here
         return redirect(url_for('dashboard'))
     else:
-        #get the nodes:: called only once
-        for node_data in njson['nodes']:
-            node_id = int(node_data[0])
-            status = node_data[1]
-            mode = node_data[2]
-
-            node = Nodes.query.get(node_id)
-            #if node exists already then update
-            if node:
-                node.status = status
-                node.mode = mode
-                try:
-                    db.session.commit() 
-                except:
-                    return f'There was an error adding node{node_id}'
-            else:
-                node = Nodes(status=status, mode=mode)
-                try:
-                    db.session.add(node)
-                    db.session.commit() 
-                except:
-                    return f'There was an error adding node{node_id}'
         nodes = Nodes.query.all()
         return render_template('dashboard.html', nodes=nodes)
 
-@app.route('/update/<int:id>', methods=['GET', 'POST'])
+@app.route('/update/<int:id>', methods=['POST'])
 @login_required
 def update(id):
-    #called from the dropdown
-    #single update
+    # Parse JSON from the request body
+    data = request.get_json()
+    if not data or 'node_id' not in data:
+        return jsonify({"error": "Invalid data"}), 400
+    #instead of commit push to serial the read from serial 
+    # makes sense
+    #do the same for update all
     node = Nodes.query.get_or_404(id)
-    node.status = request.form['node_id']
+    node.status = data['status']
     try:
-        db.session.commit() 
-    except:
-        return f'There was an error updating node{node.id}'
-    return redirect(url_for('dashboard'))
+        db.session.commit()
+        return jsonify({"success": f"Node {node.id} updated"}), 200
     
-@app.route('/update_all', methods=['GET', 'POST'])
+    except:
+        return jsonify({"error": f"There was an error updating node {node.id}"}), 500
+    
+@app.route('/update_all', methods=['POST'])
 @login_required
 def update_all():
-    #called from 'ALL' button in form
-    #multiple update
-    nodes = Nodes.query.all()
-    for node in nodes:
-        node.status = request.form['value']
     try:
-        db.session.commit() 
-    except:
-        return 'There was an error updating nodes' 
-    return redirect(url_for('dashboard'))
+        # Get JSON data safely
+        data = request.get_json()
+        if not data or 'status' not in data:
+            return jsonify({"error": "Invalid or missing 'status' key"}), 400
+
+        # Update all nodes
+        nodes = Nodes.query.all()
+        for node in nodes:
+            node.status = data['status']
+        
+        db.session.commit()
+        return jsonify({"success": "All nodes updated"}), 200
+    except Exception as e:
+        print(f"Error updating all nodes: {e}")
+        return jsonify({"error": "There was an error updating nodes"}), 500
+
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+# #start ngrok
+# def start_ngrok():
+#     from pyngrok import ngrok
+#     url = ngrok.connect(5000)
+#     print('Tunnel url:', url)
+
+# if app.config['START_NGROK']:
+#     start_ngrok()

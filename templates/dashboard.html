@@ -1,52 +1,74 @@
-{% extends "base.html" %}
+{% extends "base.html" %} 
 {% block content %}
 <div class="container">
-    <div class="btn2">
-        <div class="btn">
-          <p>TURN ON</p>
-          <button type="submit" name="ON">ALL</button> 
-      
-          <div class="dropdown">
-            <button class="dropdown-btn">Select Node</button>
-            <div class="dropdown-content">
-              <div class="search-wrapper">
-                <input type="text" id="dropdownSearch" placeholder="Search...">
-                <button class="go-btn" id="goBtn1">GO</button>
-              </div>
-              {% for node in nodes %}
-                <a href="/update/{{node.id}}">{{ node.id }}</a>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
+  
+  <div class="btn2">
+    <div class="btn">
+      <p>TURN ON</p>
+      <button id="all-on" type="submit" name="ON">ALL</button>
 
-    <br>
-    <span>{# turn off #}</span>
+      <div class="dropdown">
+        <button class="dropdown-btn">Select Node</button>
+        <div class="dropdown-content">
+          <div class="search-wrapper">
+            <input type="text" id="dropdownSearch1" placeholder="Search..." />
+            <button class="go-btn" id="goBtn1">GO</button>
+          </div>
+          {% for node in nodes %}
+          <a>{{ node.id }}</a>
+          {% endfor %}
+        </div>
+      </div>
     </div>
-    <br><br><br>
-    <div class="container">
+
+    <br />
+  </div>
+
+  <div class="btn2">
+    <div class="btn">
+      <p>TURN OFF</p>
+      <button id="all-off" type="submit" name="OFF">ALL</button>
+
+      <div class="dropdown">
+        <button class="dropdown-btn">Select Node</button>
+        <div class="dropdown-content">
+          <div class="search-wrapper">
+            <input type="text" id="dropdownSearch2" placeholder="Search..." />
+            <button class="go-btn" id="goBtn2">GO</button>
+          </div>
+          {% for node in nodes %}
+          <a>{{ node.id }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <br /><br /><br />
+  <div class="container">
     {# table here #}
-        <table class="table">
-            <thead>
-                <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Status</th>
-                <th scope="col">Mode</th>
-                </tr>
-            </thead>
-            <tbody class="table-group-divider">
-                {% for node in nodes %}
-                    <tr>
-                        <th>{{node.id}}</th>
-                        <th>{{node.status}}</th>
-                        <th>{{node.mode}}</th>
-                    </tr>
-                {% endfor %}
-            </tbody>
-            <tfoot>
-                {# last updated details#}
-            </tfoot>
-        </table>
-    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Status</th>
+          <th scope="col">Battery[Volts]</th>
+          <th scope="col">LDR_RES[higher = less light]</th>{#IMPORTANT#}
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        {% for node in nodes %}
+        <tr>
+          <th>{{node.id}}</th>
+          <th>{{node.status}}</th>
+          <th>{{node.battery_lvl}}</th>
+          <th>{{node.ldr_res}}</th>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        {# last updated details#}
+      </tfoot>
+    </table>
+  </div>
 </div>
 {% endblock %}

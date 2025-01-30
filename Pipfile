@@ -12,6 +12,7 @@ flask-wtf = "*"
 flask-bcrypt = "*"
 flask-migrate = "*"
 pyserial = "*"
+pyngrok = "*"
 
 [dev-packages]
 
