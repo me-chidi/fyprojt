@@ -1,8 +1,10 @@
 import json
 import os
-import threading
+from threading import Thread
+from time import sleep
 import pyduino as pyd
 from flask import Flask, request, redirect, url_for, render_template, jsonify, session
+from turbo_flask import Turbo
 from flask_login import login_required, current_user, LoginManager, UserMixin, login_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -19,10 +21,23 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = os.environ.get('FSKY') or 'not-a-secret'
 app.config['START_NGROK'] = os.environ.get('START_NGROK') is not None and \
     os.environ.get('WERKZEUG_RUN_MAIN') 
+app.config['SERVER_NAME'] = '127.0.0.1' or 'localhost'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
+turbo = Turbo(app)
 
+
+def updater_thread():
+    with app.app_context():
+        while True:
+            sleep(1.5)
+            try:
+                print('🔄 Sending TurboFlask update...')  # Debugging print
+                turbo.push(turbo.update(render_template('stat-table.html'), 'table'))
+            except Exception as e:
+                print(f'❌ TurboFlask push failed: {e}')
+        
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'index'
@@ -65,17 +80,16 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 #logs the user out after 10 minutes
-@app.before_request 
-def make_session_permanent():
-    session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=10)
+# @app.before_request 
+# def make_session_permanent():
+#     session.permanent = True
+#     app.permanent_session_lifetime = timedelta(minutes=10)
 
-
-serial_thread = threading.Thread(target=pyd.read_json_data, args=(pyd.connect_arduino(), db, Nodes, app.app_context()), daemon=True, )
-serial_thread.start()
 
 @app.route('/', methods=['GET','POST'])
 def index():
+    if current_user.is_authenticated:   #prevents user from accessing login page when logged in
+        redirect(url_for('dashboard'))
     fail = False
     form = LoginForm()
     if form.validate_on_submit():
@@ -93,6 +107,8 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:   #prevents user from accessing login page when logged in
+        redirect(url_for('dashboard'))
     duplicate = False
     fail = False
     form = RegisterForm()
@@ -112,15 +128,12 @@ def register():
                 fail = True
     return render_template('register.html', form=form, fail=fail, duplicate=duplicate)
 
-@app.route('/dashboard', methods=['GET', 'POST'])
+@app.route('/dashboard')
 @login_required
 def dashboard():
-    if request.method == 'POST':
-    #monitring stuff here
-        return redirect(url_for('dashboard'))
-    else:
-        nodes = Nodes.query.all()
-        return render_template('dashboard.html', nodes=nodes)
+    #reload the html table here every 2 seconds
+    nodes = Nodes.query.all()
+    return render_template('dashboard.html', nodes=nodes)
 
 @app.route('/update/<int:id>', methods=['POST'])
 @login_required
@@ -129,44 +142,64 @@ def update(id):
     data = request.get_json()
     if not data or 'node_id' not in data:
         return jsonify({"error": "Invalid data"}), 400
-    #instead of commit push to serial the read from serial 
-    # makes sense
-    #do the same for update all
-    node = Nodes.query.get_or_404(id)
-    node.status = data['status']
-    try:
-        db.session.commit()
-        return jsonify({"success": f"Node {node.id} updated"}), 200
     
-    except:
-        return jsonify({"error": f"There was an error updating node {node.id}"}), 500
+    node = Nodes.query.get_or_404(id)
+    to_serial = f'{data['to_serial']}{id}\n'
+    try:
+        # Send data to Arduino
+        if pyd.serial_connection and pyd.serial_connection.is_open:
+            pyd.serial_connection.write(to_serial.encode('utf-8'))
+            return jsonify({'success': f'Node {node.id} turn {data['status']} request sent to Arduino'}), 200
+        else:
+            return jsonify({'error': 'Serial connection not available'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error updating node {node.id}: {e}'}), 500
     
 @app.route('/update_all', methods=['POST'])
 @login_required
 def update_all():
+    # Get JSON data safely
+    data = request.get_json()
+    if not data or 'status' not in data:
+        return jsonify({'error': 'Invalid or missing "status" key'}), 400
+
+    #if status ON 'atv' append looped node.id
+    # Update all nodes
+    command = 'atv' if data['status'] == 'ON' else 'dtv'
+    nodes = Nodes.query.all()
+
     try:
-        # Get JSON data safely
-        data = request.get_json()
-        if not data or 'status' not in data:
-            return jsonify({"error": "Invalid or missing 'status' key"}), 400
-
-        # Update all nodes
-        nodes = Nodes.query.all()
         for node in nodes:
-            node.status = data['status']
-        
-        db.session.commit()
-        return jsonify({"success": "All nodes updated"}), 200
+            to_serial = f'{command}{node.id}\n'
+                # Send data to Arduino
+            if pyd.serial_connection and pyd.serial_connection.is_open:
+                pyd.serial_connection.write(to_serial.encode('utf-8'))  
+        # the exception is not caught here for some reason 
+            else:
+                return jsonify({'error': 'Serial connection not available'}), 500
     except Exception as e:
-        print(f"Error updating all nodes: {e}")
-        return jsonify({"error": "There was an error updating nodes"}), 500
-
+        return jsonify({'error': f'Error updating nodes: {e}'}), 500
+    else:
+        return jsonify({'success': f'All Nodes turn {data['status']} request sent to Arduino'}), 200
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+@app.context_processor
+def inject_nodes():
+    nodes = Nodes.query.all()
+    return {'nodes': nodes}
+
+try:
+    pyduino_thread = Thread(target=pyd.start_pyduino, args=(db, Nodes, app), daemon=True)
+    pyduino_thread.start()
+    upthread = Thread(target=updater_thread, daemon=True)
+    upthread.start()
+except Exception as e:
+    print(f'An error occurred.\nError: {e}')
 
 # #start ngrok
 # def start_ngrok():

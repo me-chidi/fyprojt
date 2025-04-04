@@ -1,7 +1,6 @@
 {% extends "base.html" %} 
 {% block content %}
 <div class="container">
-  
   <div class="btn2">
     <div class="btn">
       <p>TURN ON</p>
@@ -44,31 +43,9 @@
     </div>
   </div>
   <br /><br /><br />
-  <div class="container">
     {# table here #}
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Status</th>
-          <th scope="col">Battery[Volts]</th>
-          <th scope="col">LDR_RES[higher = less light]</th>{#IMPORTANT#}
-        </tr>
-      </thead>
-      <tbody class="table-group-divider">
-        {% for node in nodes %}
-        <tr>
-          <th>{{node.id}}</th>
-          <th>{{node.status}}</th>
-          <th>{{node.battery_lvl}}</th>
-          <th>{{node.ldr_res}}</th>
-        </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        {# last updated details#}
-      </tfoot>
-    </table>
-  </div>
+    <div id="table">
+      {% include "stat-table.html" %}
+    </div>
 </div>
 {% endblock %}

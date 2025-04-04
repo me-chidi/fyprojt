@@ -1,0 +1,28 @@
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Status</th>
+        <th scope="col">Battery[Volts]</th>
+        <th scope="col">LDR-resistance[higher = less light]</th>{#IMPORTANT#}
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      {% for node in nodes %}
+      <tr>
+        <th>{{node.id}}</th>
+        <th>{{node.status}}</th>
+        <th>{{node.battery_lvl}}</th>
+        <th>{{node.ldr_res}}</th>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th>{# space for last update dets #}</th>
+      </tr>
+    </tfoot>
+</table>

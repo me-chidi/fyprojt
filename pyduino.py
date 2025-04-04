@@ -3,16 +3,13 @@ import serial.tools.list_ports
 import json
 import time
 
-# Note:
-# check_presence() at first run is tied to the inital usb port
-# it identified an arduino. It will reserve and check only on that port.
-# So you're better off plugging it back to the same port you
-# initially used
 
 
 """Do not use this module as is unless you want to go through the hassle
 of commenting out the json part.
 """
+
+
 
 def find_arduino():
     """Find the connected Arduino by checking available serial ports."""
@@ -25,6 +22,7 @@ def find_arduino():
 
 def connect_arduino():
     """Attempt to connect to Arduino and return the serial object."""
+    # global serial_connection
     while True:
         port = find_arduino()
         if port:
@@ -37,19 +35,22 @@ def connect_arduino():
             except serial.SerialException as e:
                 print(f"❌ Failed to connect: {e}")
         else:
-            print("❌ No Arduino found. Retrying in 2 seconds...")
+            print("❌ No Arduino found. Retrying...")
         
-        time.sleep(2)  # Retry every 2 seconds
+        time.sleep(2.5)  # Retry every 2.5 seconds
 
-def read_json_data(ser, db_obj, db_model, context):
-    """Continuously reads JSON data from Arduino and save to the databse."""
-    with context:
+def read_json_data(db_obj, db_model, app):
+    """Continuously reads JSON data from Arduino and saves to the database."""
+    global serial_connection
+    serial_connection = connect_arduino()
+    with app.app_context():
         while True:
             try:
-                if ser.in_waiting > 0:
-                    line = ser.readline().decode("utf-8").strip()
+                if serial_connection.in_waiting > 0:
+                    line = serial_connection.readline().decode("utf-8").strip()
                     if line:
                         try:
+                            #read json and save to the database
                             data = json.loads(line)
                             print("📊 Received JSON:", data)
 
@@ -63,19 +64,18 @@ def read_json_data(ser, db_obj, db_model, context):
                                     continue
 
                                 node_id = int(key[-1])  # Get last character (e.g., node1 -> 1)
-                                sta = values.get("sta", None)
-                                batt = values.get("batt", None)
-                                ldr = values.get("ldr", None)
+                                sta = values.get('sta', None)
+                                batt = values.get('batt', None)
+                                ldr = values.get('ldr', None)
 
                                 if sta is not None and batt is not None and ldr is not None:
                                     status = "ON" if sta == 1 else "OFF"
-
 
                                     node = db_model.query.get(node_id)
                                     #if node exists already then update
                                     if node:
                                         node.status = status
-                                        node.battery_lvl = batt * 0.0197
+                                        node.battery_lvl = round(batt * 0.0197, 2)
                                         node.ldr_res = ldr
                                         try:
                                             db_obj.session.commit() 
@@ -94,17 +94,24 @@ def read_json_data(ser, db_obj, db_model, context):
                             print(f"⚠️ Invalid JSON received: {line}")
             except serial.SerialException:
                 print("❌ Connection lost! Attempting to reconnect...")
-                ser.close()
-                ser = connect_arduino()  # Reconnect if connection is lost
+                serial_connection.close()
+                serial_connection = connect_arduino()  # Reconnect if connection is lost
+
+#new main fxn for imports
+def start_pyduino(db_obj, db_model, app):
+    read_json_data(db_obj, db_model, app)
 
 
 if __name__ == "__main__":
     try:
         serial_connection = connect_arduino()
         read_json_data(serial_connection)
-    except KeyboardInterrupt:
-        print('Exiting...')
+    except Exception as e:
+        print(f'Error!: {e}')
 
 # #starts the service --mostlikely used same as ngrok was used
 # def check_ard():
 #     port_controller.start()
+
+#consider making all this a class
+# for better packing

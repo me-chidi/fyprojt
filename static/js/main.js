@@ -95,25 +95,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const updateIndividualNode = async (nodeId, status) => {
   try {
+    if (status === "ON") {
+      to_serial = "atv";
+    }else {
+      to_serial = "dtv";
+    }
     const response = await fetch(`http://127.0.0.1:5000/update/${nodeId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ node_id: nodeId, status: status }),
+      body: JSON.stringify({ node_id: nodeId, to_serial: to_serial, status: status }),
     });
 
     if (response.ok) {
       const data = await response.json();
       console.log("Response data:", data);
-      setTimeout(() => {
-        document.location.replace("/dashboard");
-      }, 200);
+      // setTimeout(() => {
+      //   document.location.replace("/dashboard");
+      // }, 200);
     } else {
-      console.error("Error: Failed to update node", response.status);
+      const errorData = await response.json();
+      console.error("Error:", errorData.error || "Unknown error");  
     }
   } catch (error) {
-    console.error("Error occurred while updating individual node", error);
+    console.error("Error occurred while updating individual node:", error);
   }
 };
 
@@ -130,9 +136,9 @@ const updateAllNode = async (status) => {
     if (response.ok) {
       const data = await response.json();
       console.log("Response data:", data);
-      setTimeout(() => {
-        document.location.replace("/dashboard");
-      }, 200);
+      // setTimeout(() => {
+      //   document.location.replace("/dashboard");
+      // }, 200);
     } else {
       const errorData = await response.json();
       console.error("Error:", errorData.error || "Unknown error");
