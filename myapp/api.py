@@ -1,12 +1,11 @@
+from datetime import timedelta
 from flask_login import (
     login_required,
     current_user,
-    LoginManager,
-    UserMixin,
     login_user,
     logout_user,
 )
-from flask import Flask, Blueprint, request, redirect, url_for, render_template, jsonify, session
+from flask import Blueprint, request, redirect, session, url_for, render_template, jsonify
 from myapp.forms import LoginForm, RegisterForm
 from myapp.models import User, Nodes
 from myapp import bcrypt, db, login_manager
@@ -19,16 +18,16 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # logs the user out after 10 minutes
-# @app.before_request
-# def make_session_permanent():
-#     session.permanent = True
-#     app.permanent_session_lifetime = timedelta(minutes=10)
+@api.before_request
+def make_session_permanent():
+    session.permanent = True
+    api.permanent_session_lifetime = timedelta(minutes=10)
 
 
 @api.route("/", methods=["GET", "POST"])
 def index():
     if current_user.is_authenticated: # prevents user from accessing login page when logged in
-        return redirect(url_for("api.api.dashboard"))
+        return redirect(url_for("api.dashboard"))
     fail = False
     form = LoginForm()
     if form.validate_on_submit():
@@ -37,7 +36,7 @@ def index():
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
-                return redirect(url_for("api.api.dashboard"))
+                return redirect(url_for("api.dashboard"))
             else:
                 fail = True
         else:
@@ -48,7 +47,7 @@ def index():
 @api.route("/register", methods=["GET", "POST"])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for("api.api.dashboard"))
+        return redirect(url_for("api.dashboard"))
     duplicate = False
     fail = False
     form = RegisterForm()
@@ -63,7 +62,7 @@ def register():
             try:
                 db.session.add(user)
                 db.session.commit()
-                return redirect(url_for("api.api.index"))
+                return redirect(url_for("api.index"))
             except:
                 fail = True
     return render_template("register.html", form=form, fail=fail, duplicate=duplicate)
@@ -135,10 +134,5 @@ def update_all():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for("api.api.index"))
+    return redirect(url_for("api.index"))
 
-
-@api.context_processor
-def inject_nodes():
-    nodes = Nodes.query.all()
-    return {"nodes": nodes}

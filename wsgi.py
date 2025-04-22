@@ -17,9 +17,15 @@ def updater_thread():
             except Exception as e:
                 print(f"❌ TurboFlask push failed: {e}")
 
+# api.context_processor provides only 
+# to templates rendered with the api route
+@app.context_processor
+def inject_nodes():
+    nodes = Nodes.query.all()
+    return {"nodes": nodes}
 
 # ties the working threads to the main process when FLASK_DEBUG=1
-# breaks the websocket for turbo streams though
+# but breaks the websocket for turbo streams
 if app.config["MAIN_PROC"]:
     try:
         pyduino_thread = Thread(
