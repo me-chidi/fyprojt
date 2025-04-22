@@ -1,11 +1,16 @@
 {% extends "base.html" %} 
+
+{% block title %}zDashboard{% endblock %}
+
 {% block content %}
 <div class="container">
+  {# turn OFF section #}
   <div class="btn2">
     <div class="btn">
       <p>TURN ON</p>
       <button id="all-on" type="submit" name="ON">ALL</button>
 
+      {# dropdown #}
       <div class="dropdown">
         <button class="dropdown-btn">Select Node</button>
         <div class="dropdown-content">
@@ -19,15 +24,16 @@
         </div>
       </div>
     </div>
-
     <br />
   </div>
 
+  {# turn OFF section #}
   <div class="btn2">
     <div class="btn">
       <p>TURN OFF</p>
       <button id="all-off" type="submit" name="OFF">ALL</button>
 
+      {# dropdown #}
       <div class="dropdown">
         <button class="dropdown-btn">Select Node</button>
         <div class="dropdown-content">
@@ -42,10 +48,9 @@
       </div>
     </div>
   </div>
+  
+  {# status table here #}
   <br /><br /><br />
-    {# table here #}
-    <div id="table">
-      {% include "stat-table.html" %}
-    </div>
+  {% include "stat-table.html" %}
 </div>
 {% endblock %}

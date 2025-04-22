@@ -1,24 +1,25 @@
 {% extends "base.html" %}
+
 {% block title %}zLogin{% endblock %}
+
 {% block content %}
     <br><br>
     <div class="container">
-        {# if login fails throw warning #}
         <h3>Welcome to Zigbee Street Light Control Panel!</h3>
+        {# if login fails throw warning #}
         {% if fail %}
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 <strong>Username or password does not match!</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         {% endif %}  
-        <form action="" method="post">
+        <form action="" method="post" data-turbo="false">
             <ol>{{ form.hidden_tag() }}</ol>
             <ol>{{ form.username }}</ol>
             <ol>{{ form.password }}</ol>
             <ol>{{ form.submit }}</ol>
         </form>
         <br><br>
-        <a href="{{ url_for("register") }}">Don't have an account? Register</a>
+        <a href="{{ url_for("api.register") }}">Don't have an account? Register</a>
     </div>
-    
 {% endblock %}

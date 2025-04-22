@@ -17,13 +17,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         {% endif %}
-        <form action="" method="post">
+        <form action="" method="post" data-turbo="false">
             <ol>{{ form.hidden_tag() }}</ol>
             <ol>{{ form.username }}</ol>
             <ol>{{ form.password }}</ol>
             <ol>{{ form.submit }}</ol>
         </form>
         <br><br>
-        <a href="{{ url_for("index") }}">Already have an account? Login</a>
+        <a href="{{ url_for("api.index") }}">Already have an account? Login</a>
     </div>
 {% endblock %}

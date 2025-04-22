@@ -83,10 +83,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const allOffBtn = document.getElementById("all-off");
   const allOnBtn = document.getElementById("all-on");
+
   allOffBtn.addEventListener("click", () => {
     updateAllNode("OFF");
     alert(`You Turned OFF all Nodes!`);
   });
+  
   allOnBtn.addEventListener("click", () => {
     updateAllNode("ON");
     alert(`You Turned ON all Nodes!`);
@@ -111,9 +113,6 @@ const updateIndividualNode = async (nodeId, status) => {
     if (response.ok) {
       const data = await response.json();
       console.log("Response data:", data);
-      // setTimeout(() => {
-      //   document.location.replace("/dashboard");
-      // }, 200);
     } else {
       const errorData = await response.json();
       console.error("Error:", errorData.error || "Unknown error");  
@@ -136,9 +135,6 @@ const updateAllNode = async (status) => {
     if (response.ok) {
       const data = await response.json();
       console.log("Response data:", data);
-      // setTimeout(() => {
-      //   document.location.replace("/dashboard");
-      // }, 200);
     } else {
       const errorData = await response.json();
       console.error("Error:", errorData.error || "Unknown error");
