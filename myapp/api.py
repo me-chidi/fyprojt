@@ -11,11 +11,13 @@ from myapp.models import User, Nodes
 from myapp import bcrypt, db, login_manager
 import pyduino as pyd
 
-api = Blueprint('api', __name__)
+api = Blueprint("api", __name__)
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
 
 # logs the user out after 10 minutes
 @api.before_request
@@ -26,7 +28,7 @@ def make_session_permanent():
 
 @api.route("/", methods=["GET", "POST"])
 def index():
-    if current_user.is_authenticated: # prevents user from accessing login page when logged in
+    if current_user.is_authenticated:  # prevents user from accessing login page when logged in
         return redirect(url_for("api.dashboard"))
     fail = False
     form = LoginForm()
@@ -63,7 +65,7 @@ def register():
                 db.session.add(user)
                 db.session.commit()
                 return redirect(url_for("api.index"))
-            except:
+            except Exception:
                 fail = True
     return render_template("register.html", form=form, fail=fail, duplicate=duplicate)
 
@@ -82,7 +84,7 @@ def update(id):
     if not data or "node_id" not in data:
         return jsonify({"error": "Invalid data"}), 400
 
-    node = Nodes.query.get_or_404(id)
+    node = Nodes.query.get_or_404(id)  # query method is deprecated will cause a warning in pytest
     to_serial = f"{data['to_serial']}{id}\n"
     try:
         # Send data to Arduino
@@ -90,9 +92,7 @@ def update(id):
             pyd.serial_connection.write(to_serial.encode("utf-8"))
             return (
                 jsonify(
-                    {
-                        "success": f"Node {node.id} turn {data['status']} request sent to Arduino"
-                    }
+                    {"success": f"Node {node.id} turn {data['status']} request sent to Arduino"}
                 ),
                 200,
             )
@@ -123,9 +123,7 @@ def update_all():
         return jsonify({"error": f"Error updating nodes: {e}"}), 500
     else:
         return (
-            jsonify(
-                {"success": f"All Nodes turn {data['status']} request sent to Arduino"}
-            ),
+            jsonify({"success": f"All Nodes turn {data['status']} request sent to Arduino"}),
             200,
         )
 
@@ -135,4 +133,3 @@ def update_all():
 def logout():
     logout_user()
     return redirect(url_for("api.index"))
-

@@ -26,14 +26,12 @@ def create_app():
     login_manager.login_view = "api.index"
 
     from myapp.api import api as api_blueprint
+
     app.register_blueprint(api_blueprint)
 
     return app
 
 
-from myapp.models import User, Nodes
-from myapp.forms import LoginForm, RegisterForm
-from myapp import api
-
-
-
+from myapp.models import User, Nodes  # noqa
+from myapp.forms import LoginForm, RegisterForm  # noqa
+from myapp import api  # noqa

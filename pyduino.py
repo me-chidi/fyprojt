@@ -9,7 +9,8 @@ import time
     and the Arduino device.
 """
 
-global serial_connection
+serial_connection = None
+flag = True  # necessary to use a global flag to enable TDD
 
 
 def find_arduino():
@@ -49,7 +50,8 @@ def read_json_data(db_obj, db_model, app):
     global serial_connection
     serial_connection = connect_arduino()
     with app.app_context():
-        while True:
+        global flag  # noqa
+        while flag:
             # catches serial errors
             try:
                 if serial_connection.in_waiting > 0:
@@ -69,9 +71,7 @@ def read_json_data(db_obj, db_model, app):
                                 if not values:  # Skip empty node
                                     continue
 
-                                node_id = int(
-                                    key[-1]
-                                )  # Get last character (e.g., node1 -> 1)
+                                node_id = int(key[-1])  # Get last character (e.g., node1 -> 1)
                                 sta = values.get("sta", None)
                                 batt = values.get("batt", None)
                                 ldr = values.get("ldr", None)

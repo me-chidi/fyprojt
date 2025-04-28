@@ -12,12 +12,12 @@ flask-wtf = "*"
 flask-bcrypt = "*"
 flask-migrate = "*"
 pyserial = "*"
-pyngrok = "*"
 turbo-flask = "*"
-pytest = "*"
-decorator = "*"
 
 [dev-packages]
+pytest = "*"
+pytest-sugar = "*"
+pyngrok = "*"
 
 [requires]
 python_version = "3.12"
