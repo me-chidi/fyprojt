@@ -43,7 +43,7 @@ By default it should be served on `https://localhost:5000` or `https://127.0.0.1
 If you desire to access the server from another machine other than the machine it is hosted on, change the `START_NGROK` variable to `True` and access it from the "Ngrok Tunnel" link provided in the terminal. You may familiarize yourself with the use of ngrok [here](https://ngrok.com/docs/getting-started/). The pyngrok module was used here so you would only need to set a few environmental variables for authentication.
 
 ### Nominal use:
-Plug in an Arduino that outputs a nested json, an example can be seen in the [test_pyduino.py](https://github.com/me-chidi/fyprojt/blob/main/tests/test_pyduino.py) module in the form of a variable called `json_data` used for tests. The server displays realtime changes without reloading the page.
+Plug in an Arduino that outputs a nested json, an example can be seen in the [test_pyduino.py](https://github.com/me-chidi/fyprojt/blob/main/tests/test_pyduino.py) module in the form of a variable called `json_data` used for tests. The server automatically displays realtime changes without reloading the page.
 
 ### Not-Nominal use:
 Although ideally made to control street lights, the app could be used to control and monitor other devices with a little tweak. Provided they are interfaced with an Arduino and accept serial commands.     
