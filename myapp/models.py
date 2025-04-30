@@ -9,12 +9,6 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
 
 
-class OperationalTime(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    on_time = db.Column(db.DateTime)
-    off_time = db.Column(db.DateTime)
-
-
 class Nodes(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.String(5), nullable=False)
