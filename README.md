@@ -21,12 +21,19 @@ After making a pull request, use pipenv to install dependencies
 ```bash
 pipenv install
 ```
+
 also install the --dev dependency `pyngrok` for "external" use
+
 ```bash
 pipenv install --dev pyngrok
 ```
 
-Then call
+finally create the database with 
+```bash
+flask db upgrade
+```
+
+Then run the app
 ```bash
 flask run
 ```
