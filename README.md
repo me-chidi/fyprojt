@@ -7,7 +7,7 @@ A webapp that pulls data from an Arduino via serial json and also writes to it w
 Overview
 --------
 
-FYPROJT is a zApp (Zigbee app) that facilitates the control and monitoring of Zigbee-controlled street lights (nodes). Connected to an arduino that serves as the interface between the `flask` webserver and the nodes, real time data pertaining to the status of the nodes are pulled from the Arduino and displayed through the browser. The nodes can also be turned on/off individually or all at once with the click of a button. 
+FYPROJT is a zApp (Zigbee app) that facilitates the control and monitoring of Zigbee-controlled street lights (nodes). Connected to an Arduino that serves as the interface between the `flask` webserver and the nodes, real time data pertaining to the status of the nodes are pulled from the Arduino and displayed through the browser. The nodes can also be turned on/off individually or all at once with the click of a button. 
 
 Usage Instructions
 ------------------
