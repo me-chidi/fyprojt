@@ -45,7 +45,7 @@ def start_ngrok():
     from pyngrok import ngrok
 
     url = ngrok.connect(5000)
-    print("Tunnel url:", url)
+    print(url)
 
 
 if app.config["START_NGROK"]:
